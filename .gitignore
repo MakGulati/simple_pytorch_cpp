@@ -1,0 +1,5 @@
+# vscode stuff
+.vscode
+
+# build dir
+build/
