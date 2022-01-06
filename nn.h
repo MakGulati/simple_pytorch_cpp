@@ -1,4 +1,3 @@
-// Copyright 2020-present pytorch-cpp Authors
 #pragma once
 
 #include <torch/torch.h>
