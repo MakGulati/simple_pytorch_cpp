@@ -1,30 +1,16 @@
 #include <torch/torch.h>
 #include <iostream>
 #include <iomanip>
-#include "csv.h"
+// #include "csv.h"
 #include "nn.h"
 
 // Read csv for features
 torch::Tensor read_data()
 {
 
-    io::CSVReader<4> in("../data/features.csv");
-    in.read_header(io::ignore_extra_column, "feature1", "feature2", "feature3", "feature4");
-    int feature1;
-    int feature2;
-    int feature3;
-    int feature4;
+    std::vector<int> myvector{1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11, 12, 12, 12, 12};
 
-    std::vector<int> myvector{};
-    while (in.read_row(feature1, feature2, feature3, feature4))
-    {
-        myvector.push_back(feature1);
-        myvector.push_back(feature2);
-        myvector.push_back(feature3);
-        myvector.push_back(feature4);
-    }
-
-    torch::Tensor inputs = torch::tensor(myvector).to(torch::kFloat32).view({-1, 4});
+    torch::Tensor inputs = torch::tensor(myvector).to(torch::kFloat32).view({12, 4});
 
     return inputs.clone();
 }
@@ -33,19 +19,12 @@ torch::Tensor read_data()
 torch::Tensor read_label()
 {
 
-    io::CSVReader<1> in("../data/labels.csv");
-    in.read_header(io::ignore_extra_column, "label");
-    int label;
+    std::vector<int> myvector{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1};
 
-    std::vector<int> myvector{};
-    while (in.read_row(label))
-    {
-        myvector.push_back(label);
-    }
-
-    torch::Tensor label_tensor = torch::tensor(myvector).to(torch::kFloat32).view({-1, 1});
+    torch::Tensor label_tensor = torch::tensor(myvector).to(torch::kFloat32).view({12, 1});
     return label_tensor.clone();
 }
+
 // Pack features and label tensors
 std::pair<torch::Tensor, torch::Tensor> load_dataset()
 {
@@ -96,8 +75,8 @@ int main(int argc, const char *argv[])
     const int64_t input_size = 4;
     const int64_t hidden_size = 2;
     const int64_t num_classes = 1;
-    const int64_t batch_size = 8;
-    const size_t num_epochs = 10;
+    const int64_t batch_size = 2;
+    const size_t num_epochs = 100;
     const double learning_rate = 0.001;
 
     // Get paths of images and labels as int from the folder paths
@@ -113,7 +92,7 @@ int main(int argc, const char *argv[])
     auto data_loader = torch::data::make_data_loader<torch::data::samplers::RandomSampler>(std::move(custom_dataset), batch_size);
 
     // Number of training examples
-    auto num_train_samples = 1000;
+    auto num_train_samples = 12;
     // Logistic regression model
     NeuralNet model(input_size, hidden_size, num_classes);
 
@@ -149,6 +128,8 @@ int main(int argc, const char *argv[])
         {
             auto data = batch.data.to(device);
             auto target = batch.target.to(device);
+            std::cout << data << std::endl;
+            std::cout << target << std::endl;
             optimizer.zero_grad();
 
             // Forward pass

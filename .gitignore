@@ -3,3 +3,6 @@
 
 # build dir
 build/
+
+#trained model in cpp
+models/model_cpp.pt
